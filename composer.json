@@ -1,0 +1,30 @@
+{
+  "name": "enm/json-api-server-resource-mappers",
+  "description": "Abstract implementation which standardize mapping between json api resources and entities.",
+  "type": "library",
+  "require": {
+    "php": ">=7.0",
+    "enm/json-api-server": "^2.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.3"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Philipp Marien",
+      "email": "marien@eosnewmedia.de"
+    }
+  ],
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "Enm\\JsonApi\\Server\\ResourceMappers\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Enm\\JsonApi\\Server\\ResourceMappers\\Tests\\": "tests"
+    }
+  }
+}
