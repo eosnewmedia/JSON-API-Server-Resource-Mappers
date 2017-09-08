@@ -5,6 +5,8 @@ namespace Enm\JsonApi\Server\ResourceMappers\Mapper;
 
 use Enm\JsonApi\Exception\JsonApiException;
 use Enm\JsonApi\Exception\UnsupportedTypeException;
+use Enm\JsonApi\JsonApiAwareInterface;
+use Enm\JsonApi\JsonApiAwareTrait;
 use Enm\JsonApi\Model\Resource\ResourceInterface;
 use Enm\JsonApi\Server\Model\Request\FetchRequestInterface;
 use Enm\JsonApi\Server\ResourceMappers\Model\Entity\EntityInterface;
@@ -12,8 +14,10 @@ use Enm\JsonApi\Server\ResourceMappers\Model\Entity\EntityInterface;
 /**
  * @author Philipp Marien <marien@eosnewmedia.de>
  */
-class ResourceMapperRegistry implements ResourceMapperInterface
+class ResourceMapperRegistry implements ResourceMapperInterface, JsonApiAwareInterface
 {
+    use JsonApiAwareTrait;
+
     /**
      * @var ResourceMapperInterface[]
      */
@@ -59,7 +63,7 @@ class ResourceMapperRegistry implements ResourceMapperInterface
     {
         foreach ($this->mappers as $mapper) {
             if ($mapper->supportsEntity($entity)) {
-                $this->configureResourceMapperAware($mapper);
+                $this->configureResourceMapper($mapper);
                 $mapper->toResource($entity, $request, $resource);
 
                 return;
@@ -82,7 +86,7 @@ class ResourceMapperRegistry implements ResourceMapperInterface
     {
         foreach ($this->mappers as $mapper) {
             if ($mapper->supportsEntity($entity)) {
-                $this->configureResourceMapperAware($mapper);
+                $this->configureResourceMapper($mapper);
                 $mapper->toEntityFull($resource, $entity);
 
                 return;
@@ -105,7 +109,7 @@ class ResourceMapperRegistry implements ResourceMapperInterface
     {
         foreach ($this->mappers as $mapper) {
             if ($mapper->supportsEntity($entity)) {
-                $this->configureResourceMapperAware($mapper);
+                $this->configureResourceMapper($mapper);
                 $mapper->toEntityPartial($resource, $entity);
 
                 return;
@@ -118,10 +122,18 @@ class ResourceMapperRegistry implements ResourceMapperInterface
     /**
      * @param ResourceMapperInterface $resourceMapper
      */
-    private function configureResourceMapperAware(ResourceMapperInterface $resourceMapper)
+    private function configureResourceMapper(ResourceMapperInterface $resourceMapper)
     {
         if ($resourceMapper instanceof ResourceMapperAwareInterface) {
             $resourceMapper->setResourceMapper($this);
+        }
+
+        if ($resourceMapper instanceof JsonApiAwareInterface) {
+            try {
+                $resourceMapper->setJsonApi($this->jsonApi());
+            } catch (\RuntimeException $e) {
+
+            }
         }
     }
 }

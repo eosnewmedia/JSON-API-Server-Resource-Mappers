@@ -29,10 +29,9 @@ You should always use the registry which offers access to all mappers without re
 about how and where an entity is mapped to a resource and back.
 
 ```php
-$resourceMappers = new ResourceMapperRegistry();
+$resourceMapper = new ResourceMapperRegistry();
 // add your resource mappers to the registry
-$resourceMappers->addMapper(new \CustomMapper());
-
+$resourceMapper->addMapper(new \CustomMapper());
 ```
 
 in your request handlers method `fetchResource`:
@@ -40,8 +39,12 @@ in your request handlers method `fetchResource`:
 ```php
 // fetch entity into $entity
 
+if($resourceMapper instanceof JsonApiAwareInterface){
+    $resourceMapper->setJsonApi($this->jsonApi());
+}
+
 $resource = $this->jsonApi()->resource('examples','1');
-$resourceMappers->toResource($entity, $request, $resource);
+$resourceMapper->toResource($entity, $request, $resource);
 
 // return your document containing the resource
 ```
@@ -56,7 +59,26 @@ Your resource mapper has to implement `Enm\JsonApi\Server\ResourceMappers\Mapper
 | toEntityFull(ResourceInterface $resource, EntityInterface $entity)                               | void        | Maps all fields of the given api resource from post request to the given entity and throws an exception if required elements are missing |
 | toEntityPartial(ResourceInterface $resource, EntityInterface $entity)                            | void        | Maps only available fields of the given api resource from patch request to the given entity                                              |
 
+To simplify usage your mapper can extend `Enm\JsonApi\Server\ResourceMappers\Mapper\AbstractResourceMapper`, which already
+implements `Enm\JsonApi\JsonApiAwareInterface` and `Enm\JsonApi\Server\ResourceMappers\Mapper\ResourceMapperAwareInterface`.
+
+The abstract mapper also implements the method `toResource` but requires your mapper to implement `mapAttributesToResource`,
+`mapMetaInformationToResource` and `mapRelationshipsToResource`.
+
+If your mapper does not need one of these methods, these traits contain default (empty) implementations and can be used:
+* `Enm\JsonApi\Server\ResourceMappers\Mapper\NoAttributesTrait`
+* `Enm\JsonApi\Server\ResourceMappers\Mapper\NoMetaInformationTrait`
+* `Enm\JsonApi\Server\ResourceMappers\Mapper\NoRelationshipsTrait`
+
 ### Resource Mapper Aware
 If you want to use nested resource mapping (for example with json api relationships and includes) your mapper can implement
 `Enm\JsonApi\Server\ResourceMappers\Mapper\ResourceMapperAwareInterface` and use the `Enm\JsonApi\Server\ResourceMappers\Mapper\ResourceMapperAwareTrait`,
 which offers the method `resourceMapper` to access the resource mapper registry.
+
+### Json Api Aware
+If you want to use json api (for example for relationships) your mapper can implement
+`Enm\JsonApi\JsonApiAwareInterface` and use the `Enm\JsonApi\JsonApiAwareTrait`,
+which offers the method `jsonApi` to access the json api. As alternative you could extend the abstract mapper, which implements json api aware.
+
+If one of your mappers use json api aware it's required to set the json api into the mapper (registry) from request handler,
+which then also have to implement `Enm\JsonApi\JsonApiAwareInterface`.
