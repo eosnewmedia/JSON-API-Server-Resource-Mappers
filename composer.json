@@ -16,6 +16,11 @@
       "email": "marien@eosnewmedia.de"
     }
   ],
+  "config": {
+    "platform": {
+      "php": "7.0"
+    }
+  },
   "minimum-stability": "stable",
   "autoload": {
     "psr-4": {
