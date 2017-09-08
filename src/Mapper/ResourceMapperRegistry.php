@@ -59,6 +59,7 @@ class ResourceMapperRegistry implements ResourceMapperInterface
     {
         foreach ($this->mappers as $mapper) {
             if ($mapper->supportsEntity($entity)) {
+                $this->configureResourceMapperAware($mapper);
                 $mapper->toResource($entity, $request, $resource);
 
                 return;
@@ -81,6 +82,7 @@ class ResourceMapperRegistry implements ResourceMapperInterface
     {
         foreach ($this->mappers as $mapper) {
             if ($mapper->supportsEntity($entity)) {
+                $this->configureResourceMapperAware($mapper);
                 $mapper->toEntityFull($resource, $entity);
 
                 return;
@@ -103,6 +105,7 @@ class ResourceMapperRegistry implements ResourceMapperInterface
     {
         foreach ($this->mappers as $mapper) {
             if ($mapper->supportsEntity($entity)) {
+                $this->configureResourceMapperAware($mapper);
                 $mapper->toEntityPartial($resource, $entity);
 
                 return;
@@ -110,5 +113,15 @@ class ResourceMapperRegistry implements ResourceMapperInterface
         }
 
         throw new UnsupportedTypeException($resource->type());
+    }
+
+    /**
+     * @param ResourceMapperInterface $resourceMapper
+     */
+    private function configureResourceMapperAware(ResourceMapperInterface $resourceMapper)
+    {
+        if ($resourceMapper instanceof ResourceMapperAwareInterface) {
+            $resourceMapper->setResourceMapper($this);
+        }
     }
 }
