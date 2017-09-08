@@ -78,10 +78,7 @@ which offers the method `resourceMapper` to access the resource mapper registry.
 ### Json Api Aware
 If you want to use json api (for example for relationships) your mapper can implement
 `Enm\JsonApi\JsonApiAwareInterface` and use the `Enm\JsonApi\JsonApiAwareTrait`,
-which offers the method `jsonApi` to access the json api.
+which offers the method `jsonApi` to access the json api. As alternative you could extend the abstract mapper, which implements json api aware.
 
 If one of your mappers use json api aware it's required to set the json api into the mapper (registry) from request handler,
 which then also have to implement `Enm\JsonApi\JsonApiAwareInterface`.
-
-If your mapper extends the abstract resource mapper, json api aware is implemented by default, but your mapper is 
-required to implement the interface by it self, to avoid site effects with registry if json api is not used.

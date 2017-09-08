@@ -8,7 +8,7 @@ use Enm\JsonApi\Server\Model\Request\FetchRequestInterface;
 use Enm\JsonApi\Server\ResourceMappers\Mapper\ResourceMapperInterface;
 use Enm\JsonApi\Server\ResourceMappers\Mapper\ResourceMapperRegistry;
 use Enm\JsonApi\Server\ResourceMappers\Model\Entity\EntityInterface;
-use Enm\JsonApi\Server\ResourceMappers\Tests\Mock\ResourceMapperAwareTestInterface;
+use Enm\JsonApi\Server\ResourceMappers\Tests\Mock\TestMapper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -41,13 +41,18 @@ class ResourceMapperRegistryTest extends TestCase
 
     public function testToResourceSupported()
     {
-        /** @var ResourceMapperInterface $mapper */
-        $mapper = $this->createConfiguredMock(ResourceMapperAwareTestInterface::class, ['supportsEntity' => true]);
+        $mapper = new TestMapper();
 
         /** @var EntityInterface $entity */
         $entity = $this->createMock(EntityInterface::class);
         /** @var FetchRequestInterface $request */
-        $request = $this->createMock(FetchRequestInterface::class);
+        $request = $this->createConfiguredMock(
+            FetchRequestInterface::class,
+            [
+                'requestedResourceBody' => true,
+                'requestedRelationships' => true,
+            ]
+        );
         /** @var ResourceInterface $resource */
         $resource = $this->createMock(ResourceInterface::class);
 
